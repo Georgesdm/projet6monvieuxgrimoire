@@ -1,12 +1,10 @@
 const express = require('express');
-
 const authController = require('../controllers/authController');
+const { authenticateToken } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-// Route pour l'inscription
 router.post('/signup', authController.signUp);
-
-// Route pour la connexion
 router.post('/login', authController.login);
+router.get('/verify', authenticateToken, authController.verifyUser);
 
 module.exports = router;

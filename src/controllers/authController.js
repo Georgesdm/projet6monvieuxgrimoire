@@ -27,29 +27,34 @@ exports.signUp = async (req, res) => {
   }
 
 
-  exports.login = async (req, res) => {
+exports.login = async (req, res) => {
     const { email, password } = req.body;
-  
+
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email et mot de passe sont requis.' });
+        return res.status(400).json({ message: 'Email et mot de passe sont requis.' });
     }
-  
+
     try {
-      const user = await User.findOne({ email });
-      if (!user) {
+        const user = await User.findOne({ email });
+        if (!user) {
         return res.status(401).json({ message: 'Identifiants incorrects' });
-      }
-  
-      const validPassword = await bcrypt.compare(password, user.password);
-      if (!validPassword) {
+        }
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
         return res.status(401).json({ message: 'Identifiants incorrects' });
-      }
-  
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-  
-      res.status(200).json({ userId: user._id, token });
+        }
+
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+        res.status(200).json({ userId: user._id, token });
     } catch (error) {
-      console.error('Erreur lors de la connexion:', error);
-      res.status(500).json({ message: 'Erreur interne du serveur' });
+        console.error('Erreur lors de la connexion:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
     }
-  }
+}
+
+
+exports.verifyUser = async (req, res) => {
+    res.status(200).json({ message: 'Utilisateur authentifié', userId: req.user.userId });
+}

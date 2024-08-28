@@ -1,10 +1,10 @@
 require('dotenv').config();
-console.log('JWT_SECRET:', process.env.JWT_SECRET);
-
 const express = require('express');
 const cors = require('cors');
 const { mongoose } = require('./src/database/mongo'); // Connexion à MongoDB
-const authRoutes = require('./src/routes/auth'); // Import des routes d'authentification (mis à jour)
+const authRoutes = require('./src/routes/auth');
+const booksRoutes = require('./src/routes/books');
+const { authenticateToken } = require('./src/middleware/authMiddleware');
 
 const app = express();
 const PORT = 4000;
@@ -17,8 +17,13 @@ app.get('/', (req, res) => {
   res.json({ message: 'Server is running' });
 });
 
-// Utilisation des routes d'authentification
 app.use('/api/auth', authRoutes);
+app.use('/api/books', booksRoutes);
+
+//app.put('/api/bookis', authenticateToken, (req, res) => {
+  //res.json({ message: 'Cette route est protégée, utilisateurs uniquement', userId: req.user.userId });
+//});
+
 
 // Lancement du serveur
 app.listen(PORT, () => {
