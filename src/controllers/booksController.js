@@ -121,3 +121,40 @@ exports.ratingBook = async (req, res) => {
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 };
+
+exports.updateBook = async (req, res) => {
+    try {
+        const bookId = req.params.id;
+
+        const bookObject = req.body.book ? JSON.parse(req.body.book) : req.body;
+        delete bookObject._id;
+        delete bookObject.userId;
+
+        const book = await Book.findById(bookId);
+        if (!book) {
+            return res.status(404).json({ message: 'Livre non trouvé' });
+        }
+
+        if (req.file) {
+            if (book.imageUrl) {
+                const oldImagePath = path.join(__dirname, '../images', book.imageUrl.split('/images/')[1]);
+                fs.unlink(oldImagePath, (err) => {
+                    if (err) {
+                        console.error('Erreur lors de la suppression de l\'ancienne image:', err);
+                    }
+                });
+            }
+            bookObject.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+        }
+
+        // Update the book details
+        Object.assign(book, bookObject);
+
+        await book.save();
+
+        res.status(200).json({ message: 'Livre mis à jour avec succès', book });
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du livre:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+};
