@@ -5,6 +5,7 @@ const { mongoose } = require('./src/database/mongo'); // Connexion à MongoDB
 const authRoutes = require('./src/routes/auth');
 const booksRoutes = require('./src/routes/books');
 const { authenticateToken } = require('./src/middleware/authMiddleware');
+const path = require('path');
 
 const app = express();
 const PORT = 4000;
@@ -23,6 +24,9 @@ app.use('/api/books', booksRoutes);
 //app.put('/api/bookis', authenticateToken, (req, res) => {
   //res.json({ message: 'Cette route est protégée, utilisateurs uniquement', userId: req.user.userId });
 //});
+
+app.use('/images', express.static(path.join(__dirname, 'src/images')));
+
 
 
 // Lancement du serveur
