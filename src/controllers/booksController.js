@@ -32,3 +32,17 @@ exports.createBook = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+exports.getBook = async (req, res) => {
+    try {
+        const book = await Book.findById(req.params.id);
+        if (!book) {
+            return res.status(404).json({ message: 'Livre non trouvé' });
+        }
+        res.status(200).json(book);
+    } catch (error) {
+        console.error('Erreur lors de la récupération du livre:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+};
+
