@@ -63,7 +63,6 @@ exports.deleteBook = async (req, res) => {
     try {
         const bookId = req.params.id;
 
-        // Find the book by ID
         const book = await Book.findById(bookId);
 
         if (!book) {
@@ -73,19 +72,52 @@ exports.deleteBook = async (req, res) => {
         //image path
         const imagePath = path.join(__dirname, '../images', book.imageUrl.split('/images/')[1]);
 
-        //delete image file
         fs.unlink(imagePath, (err) => {
             if (err) {
                 console.error('Erreur lors de la suppression de l\'image:', err);
             }
         });
 
-        // Delete the book from the database
         await Book.findByIdAndDelete(bookId);
 
         res.status(200).json({ message: 'Livre et image associés supprimés avec succès' });
     } catch (error) {
         console.error('Erreur lors de la suppression du livre:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+};
+
+// Add a rating to a book
+exports.ratingBook = async (req, res) => {
+    try {
+        const bookId = req.params.id;
+        const { userId, rating } = req.body;
+
+        if (rating < 0 || rating > 5) {
+            return res.status(400).json({ message: 'La note doit être comprise entre 0 et 5.' });
+        }
+
+        const book = await Book.findById(bookId);
+        if (!book) {
+            return res.status(404).json({ message: 'Livre non trouvé' });
+        }
+
+        const existingRating = book.ratings.find(r => r.userId.toString() === userId);
+        if (existingRating) {
+            return res.status(400).json({ message: 'Vous avez déjà noté ce livre.' });
+        }
+
+        book.ratings.push({ userId, grade: rating });
+
+        const totalRating = book.ratings.reduce((acc, curr) => acc + curr.grade, 0);
+        book.averageRating = totalRating / book.ratings.length;
+
+        // Save the updated book
+        await book.save();
+
+        res.status(200).json(book);
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout de la note:', error);  
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 };

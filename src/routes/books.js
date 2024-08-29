@@ -10,6 +10,7 @@ router.post('/', authenticateToken, multer, bookController.createBook);
 router.get('/bestrating', bookController.getBestRatedBooks);
 router.get('/:id', bookController.getBook);
 router.delete('/:id', authenticateToken, bookController.deleteBook);
+router.post('/:id/rating', authenticateToken, bookController.ratingBook);
 
 
 
