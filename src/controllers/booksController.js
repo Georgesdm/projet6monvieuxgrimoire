@@ -42,7 +42,17 @@ exports.getBook = async (req, res) => {
         res.status(200).json(book);
     } catch (error) {
         console.error('Erreur lors de la récupération du livre:', error);
-        res.status(500).json({ message: 'Erreur serveur' });
+        res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 };
 
+exports.getBestRatedBooks = async (req, res) => {
+    try {
+        const bestRatedBooks = await Book.find().sort({ averageRating: -1 }).limit(3); // Find the top 3 books by average rating
+
+        res.status(200).json(bestRatedBooks);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des meilleurs livres:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+};
