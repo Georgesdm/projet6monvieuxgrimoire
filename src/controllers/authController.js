@@ -24,7 +24,7 @@ exports.signUp = async (req, res) => {
       console.error("Erreur lors de l'inscription:", error);
       res.status(500).json({ message: 'Erreur interne du serveur' });
     }
-  }
+  };
 
 
 exports.login = async (req, res) => {
@@ -52,9 +52,4 @@ exports.login = async (req, res) => {
         console.error('Erreur lors de la connexion:', error);
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
-}
-
-
-exports.verifyUser = async (req, res) => {
-    res.status(200).json({ message: 'Utilisateur authentifié', userId: req.user.userId });
-}
+  };  
