@@ -1,4 +1,6 @@
 const { Book } = require('../models/books.js');
+const fs = require('fs');
+const path = require('path');
 
 exports.getAllBooks = async (req, res) => {
     try {
@@ -53,6 +55,37 @@ exports.getBestRatedBooks = async (req, res) => {
         res.status(200).json(bestRatedBooks);
     } catch (error) {
         console.error('Erreur lors de la récupération des meilleurs livres:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+};
+
+exports.deleteBook = async (req, res) => {
+    try {
+        const bookId = req.params.id;
+
+        // Find the book by ID
+        const book = await Book.findById(bookId);
+
+        if (!book) {
+            return res.status(404).json({ message: 'Livre non trouvé' });
+        }
+
+        //image path
+        const imagePath = path.join(__dirname, '../images', book.imageUrl.split('/images/')[1]);
+
+        //delete image file
+        fs.unlink(imagePath, (err) => {
+            if (err) {
+                console.error('Erreur lors de la suppression de l\'image:', err);
+            }
+        });
+
+        // Delete the book from the database
+        await Book.findByIdAndDelete(bookId);
+
+        res.status(200).json({ message: 'Livre et image associés supprimés avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du livre:', error);
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 };
