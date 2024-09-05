@@ -5,6 +5,7 @@ const { mongoose } = require('./src/database/mongo'); // Connexion à MongoDB
 const authRoutes = require('./src/routes/auth');
 const booksRoutes = require('./src/routes/books');
 const { authenticateToken } = require('./src/middleware/authMiddleware');
+const errorHandler = require('./src/errors/errorHandler');
 const path = require('path');
 
 const app = express();
@@ -27,7 +28,7 @@ app.use('/api/books', booksRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'src/images')));
 
-
+app.use(errorHandler);
 
 // Lancement du serveur
 app.listen(PORT, () => {

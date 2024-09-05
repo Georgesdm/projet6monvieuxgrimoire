@@ -2,17 +2,16 @@ const { Book } = require('../models/books.js');
 const fs = require('fs');
 const path = require('path');
 
-exports.getAllBooks = async (req, res) => {
+exports.getAllBooks = async (req, res, next) => {
     try {
         const books = await Book.find();
         res.status(200).json(books);
     } catch (error) {
-        console.error('Erreur lors de la récupération des livres:', error);
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+        next(error);
     }
 };
 
-exports.createBook = async (req, res) => {
+exports.createBook = async (req, res, next) => {
     try {
         console.log('Request Body:', req.body);
         console.log('Request File:', req.file);
@@ -30,12 +29,11 @@ exports.createBook = async (req, res) => {
         await book.save();
         res.status(201).json({ message: 'Livre enregistré' });
     } catch (error) {
-        console.error('Erreur creation du book', error);
-        res.status(400).json({ error: error.message });
+        next(error);
     }
 };
 
-exports.getBook = async (req, res) => {
+exports.getBook = async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) {
@@ -43,23 +41,23 @@ exports.getBook = async (req, res) => {
         }
         res.status(200).json(book);
     } catch (error) {
-        console.error('Erreur lors de la récupération du livre:', error);
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+        next(error);
     }
 };
 
-exports.getBestRatedBooks = async (req, res) => {
+
+exports.getBestRatedBooks = async (req, res, nect) => {
     try {
         const bestRatedBooks = await Book.find().sort({ averageRating: -1 }).limit(3); // Find the top 3 books by average rating
 
         res.status(200).json(bestRatedBooks);
     } catch (error) {
-        console.error('Erreur lors de la récupération des meilleurs livres:', error);
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+        next(error);
     }
 };
 
-exports.deleteBook = async (req, res) => {
+
+exports.deleteBook = async (req, res, next) => {
     try {
         const bookId = req.params.id;
 
@@ -82,13 +80,13 @@ exports.deleteBook = async (req, res) => {
 
         res.status(200).json({ message: 'Livre et image associés supprimés avec succès' });
     } catch (error) {
-        console.error('Erreur lors de la suppression du livre:', error);
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+        next(error);
     }
 };
 
+
 // Add a rating to a book
-exports.ratingBook = async (req, res) => {
+exports.ratingBook = async (req, res, next) => {
     try {
         const bookId = req.params.id;
         const { userId, rating } = req.body;
@@ -117,12 +115,12 @@ exports.ratingBook = async (req, res) => {
 
         res.status(200).json(book);
     } catch (error) {
-        console.error('Erreur lors de l\'ajout de la note:', error);  
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+        next(error);
     }
 };
 
-exports.updateBook = async (req, res) => {
+
+exports.updateBook = async (req, res, next) => {
     try {
         const bookId = req.params.id;
 
@@ -154,7 +152,6 @@ exports.updateBook = async (req, res) => {
 
         res.status(200).json({ message: 'Livre mis à jour avec succès', book });
     } catch (error) {
-        console.error('Erreur lors de la mise à jour du livre:', error);
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+        next(error);
     }
 };
