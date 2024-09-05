@@ -21,11 +21,9 @@ exports.signUp = async (req, res) => {
   
       res.status(201).json({ message: 'Utilisateur enregistré avec succès' });
     } catch (error) {
-      console.error("Erreur lors de l'inscription:", error);
-      res.status(500).json({ message: 'Erreur interne du serveur' });
-    }
-  };
-
+      next(error);
+  }
+};
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
@@ -48,8 +46,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
         res.status(200).json({ userId: user._id, token });
-    } catch (error) {
-        console.error('Erreur lors de la connexion:', error);
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+      } catch (error) {
+        next(error);
     }
-  };  
+};
